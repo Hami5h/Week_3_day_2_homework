@@ -27,4 +27,33 @@ class Bounty
       db.close()
     end
 
+    def self.all()
+      db = PG.connect({
+        dbname: 'bounty_hunter',
+        host: 'localhost'
+        })
+        sql = "SELECT * FROM bounties"
+        values = []
+        db.prepare("all", sql)
+        bounties = db.exec_prepared("all", values)
+        db.close()
+
+        bounties_as_objects = bounties.map{ |bounty| Bounty.new(bounty)}
+        return bounties_as_objects
+      end
+
+      def update()
+        db = PG.connect({
+          dbname: 'bounty_hunter',
+          host: 'localhost'
+          })
+          sql = "UPDATE bounties
+          SET (name, species, bounty_value, homeworld) =
+          ($1, $2, $3, $4) WHERE id = $5"
+          values = [@name, @species, @bounty_value, @homeworld, @id]
+          db.prepare("update", sql)
+          db.exec_prepared("update", values)
+          db.close()
+        end
+
 end
